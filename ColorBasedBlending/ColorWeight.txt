@@ -1,0 +1,41 @@
+//input : base ,  d1 , d2 , d3 , d4 , blendPower
+
+float3 blendColor[5];
+blendColor[0] = base.xyz;
+blendColor[1] = d1.xyz;
+blendColor[2] = d2.xyz;
+blendColor[3] = d3.xyz;
+blendColor[4] = d4.xyz;
+
+float3 bHSV = base.xyz;
+
+float3 detailVec[4];
+float distance[4];
+float C = 0;
+
+
+for (int i = 0; i < 4; i++)
+{
+    distance[i] = 0;
+
+    detailVec[i] = blendColor[i + 1].xyz;
+
+    float3 v;
+    v.x = bHSV.x - detailVec[i].x;
+    v.y = bHSV.y - detailVec[i].y;
+    v.z = bHSV.z - detailVec[i].z;
+
+    v.x = min(v.x, 1.0 - v.x);
+
+    float dis = 1.0f / pow(dot(v, v), blendPower);
+    distance[i] = dis;
+    C += dis;
+}
+
+float result[4];
+for (int j = 0; j < 4; j++)
+{
+    result[j] = saturate(distance[j] / C);
+}
+
+return float4(result[0],result[1],result[2],result[3]);
